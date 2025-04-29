@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,13 +7,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Search, AlertCircle } from "lucide-react";
+import { getInsights } from '../api/insights';
 
 /**
  * AIInsights Component
  * 
  * This component provides AI-powered data analysis:
  * 1. Allows users to ask questions about their data
- * 2. Sends data and queries to OpenAI API via the backend
+ * 2. Sends data and queries to OpenAI API via our API function
  * 3. Displays AI-generated insights as text and structured data
  * 4. Maintains a history of previous queries and results
  * 
@@ -26,7 +28,7 @@ const AIInsights = ({ data }) => {
     const [error, setError] = useState(null);
 
     /**
-     * Sends the user query and data to the backend for AI processing
+     * Sends the user query and data to our API function for AI processing
      * @param {Event} e - Form submit event
      */
     const handleSubmit = async (e) => {
@@ -46,27 +48,12 @@ const AIInsights = ({ data }) => {
         setError(null);
 
         try {
-            // Make API request to our backend endpoint
-            const response = await fetch('/api/insights', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    query,
-                    data: {
-                        headers: data.headers,
-                        // Limit the amount of data sent to the API for performance
-                        rows: data.rows.slice(0, 100)
-                    }
-                }),
+            // Call our API function instead of making a direct fetch request
+            const result = await getInsights(query, {
+                headers: data.headers,
+                // Limit the amount of data sent to the API for performance
+                rows: data.rows.slice(0, 100)
             });
-
-            const result = await response.json();
-            
-            if (!response.ok) {
-                throw new Error(result.error || 'Failed to get insights');
-            }
             
             // Add to history and set as current insight
             const newInsight = {
@@ -131,7 +118,7 @@ const AIInsights = ({ data }) => {
                                 <p className="font-medium text-red-800">Error</p>
                                 <p className="text-red-600 text-sm">{error}</p>
                                 <p className="text-red-600 text-sm mt-1">
-                                    Please check that your OpenAI API key is correctly set in the .env file and the server is running properly.
+                                    Please check that your OpenAI API key is correctly set in the .env file with the VITE_OPENAI_API_KEY variable.
                                 </p>
                             </div>
                         </div>
