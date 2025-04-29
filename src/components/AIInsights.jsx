@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Search } from "lucide-react";
+import { Search, AlertCircle } from "lucide-react";
 
 /**
  * AIInsights Component
@@ -24,6 +23,7 @@ const AIInsights = ({ data }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [insights, setInsights] = useState(null);
     const [history, setHistory] = useState([]);
+    const [error, setError] = useState(null);
 
     /**
      * Sends the user query and data to the backend for AI processing
@@ -43,6 +43,7 @@ const AIInsights = ({ data }) => {
         }
 
         setIsLoading(true);
+        setError(null);
 
         try {
             // Make API request to our backend endpoint
@@ -61,11 +62,11 @@ const AIInsights = ({ data }) => {
                 }),
             });
 
-            if (!response.ok) {
-                throw new Error(`Error: ${response.statusText}`);
-            }
-
             const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.error || 'Failed to get insights');
+            }
             
             // Add to history and set as current insight
             const newInsight = {
@@ -79,10 +80,12 @@ const AIInsights = ({ data }) => {
             
             setInsights(newInsight);
             setHistory(prev => [newInsight, ...prev]);
+            toast.success("AI insights generated successfully");
             
         } catch (error) {
             console.error('Error fetching AI insights:', error);
-            toast.error("Failed to get insights. Please try again.");
+            setError(error.message);
+            toast.error(`Failed to get insights: ${error.message}`);
         } finally {
             setIsLoading(false);
         }
@@ -120,6 +123,19 @@ const AIInsights = ({ data }) => {
                             {isLoading ? "Analyzing..." : "Get Insights"}
                         </Button>
                     </form>
+                    
+                    {error && (
+                        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-start">
+                            <AlertCircle className="text-red-500 mr-2 h-5 w-5 flex-shrink-0 mt-0.5" />
+                            <div>
+                                <p className="font-medium text-red-800">Error</p>
+                                <p className="text-red-600 text-sm">{error}</p>
+                                <p className="text-red-600 text-sm mt-1">
+                                    Please check that your OpenAI API key is correctly set in the .env file and the server is running properly.
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 
