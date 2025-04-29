@@ -11,7 +11,7 @@ import { Upload } from "lucide-react";
  * This component handles CSV file uploads. It:
  * 1. Accepts a CSV file through a drag-drop area or file browser
  * 2. Validates that the file is a CSV
- * 3. Parses the CSV content to JSON format
+ * 3. Parses the CSV content to JSON format, handling both comma and semicolon delimiters
  * 4. Passes the parsed data to the parent component
  * 
  * @param {function} onDataLoaded - Callback function to pass the parsed JSON data to parent
@@ -71,7 +71,24 @@ const FileUpload = ({ onDataLoaded }) => {
     };
 
     /**
-     * Parses CSV text content to JSON
+     * Detects the delimiter used in the CSV file (comma or semicolon)
+     * @param {string} csvText - The CSV content as a string
+     * @returns {string} - The detected delimiter
+     */
+    const detectDelimiter = (csvText) => {
+        // Get the first line to analyze
+        const firstLine = csvText.split('\n')[0];
+        
+        // Count occurrences of potential delimiters
+        const semicolonCount = (firstLine.match(/;/g) || []).length;
+        const commaCount = (firstLine.match(/,/g) || []).length;
+        
+        // Return the most frequently occurring delimiter, default to comma
+        return semicolonCount > commaCount ? ';' : ',';
+    };
+
+    /**
+     * Parses CSV text content to JSON, handling both comma and semicolon delimiters
      * @param {string} csvText - The CSV content as a string
      * @returns {Object} - Object containing headers and rows from CSV
      */
@@ -83,12 +100,16 @@ const FileUpload = ({ onDataLoaded }) => {
             throw new Error("Empty CSV file");
         }
         
+        // Detect the delimiter used in the file
+        const delimiter = detectDelimiter(csvText);
+        console.log(`Detected delimiter: "${delimiter}"`);
+        
         // Get headers from first line
-        const headers = lines[0].split(",").map(header => header.trim());
+        const headers = lines[0].split(delimiter).map(header => header.trim());
         
         // Parse rows
         const rows = lines.slice(1).map(line => {
-            const values = line.split(",").map(value => value.trim());
+            const values = line.split(delimiter).map(value => value.trim());
             // Create an object where keys are headers and values are the corresponding CSV values
             return headers.reduce((obj, header, index) => {
                 obj[header] = values[index] || "";
@@ -148,7 +169,7 @@ const FileUpload = ({ onDataLoaded }) => {
             </CardContent>
             
             <CardFooter className="text-sm text-appGray-dark">
-                <p>Only CSV files are supported</p>
+                <p>Supports CSV files with comma or semicolon delimiters</p>
             </CardFooter>
         </Card>
     );
