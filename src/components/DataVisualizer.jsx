@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
@@ -23,7 +22,7 @@ const DataVisualizer = ({ chartData, chartType = 'bar' }) => {
     // State for filtered chart data
     const [filteredData, setFilteredData] = useState([]);
     // State for filter settings
-    const [filterField, setFilterField] = useState('');
+    const [filterField, setFilterField] = useState('value');
     const [filterValue, setFilterValue] = useState('');
     const [filterType, setFilterType] = useState('equals');
     // State for showing filter panel
@@ -43,11 +42,6 @@ const DataVisualizer = ({ chartData, chartType = 'bar' }) => {
             const firstItem = chartData[0];
             const fields = Object.keys(firstItem).filter(key => key !== 'name' && key !== 'value');
             setAvailableFields(['name', 'value', ...fields]);
-            
-            // Set default filter field to the first available field
-            if (!filterField && fields.length > 0) {
-                setFilterField('value');
-            }
         } else {
             setFilteredData([]);
             setAvailableFields([]);
