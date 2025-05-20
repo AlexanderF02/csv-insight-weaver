@@ -15,6 +15,7 @@ const Editdashboard = () => {
 
     // Retrieve existing selected widgets from location.state or initialize as empty
     const [selectedWidgets, setSelectedWidgets] = useState(location.state?.selectedWidgets || []);
+    const isFeatureEnabled = location.state?.isFeatureEnabled || false; // Retrieve the isFeatureEnabled state
 
     const handleWidgetToggle = (widgetId) => {
         setSelectedWidgets((prevWidgets) => {
@@ -44,6 +45,9 @@ const Editdashboard = () => {
 
             <main className="container mx-auto px-4 sm:px-6 py-8 flex-grow">
                 <h2 className="text-lg font-bold mb-4">Select Widgets to Display</h2>
+                <p className="mb-4">
+                    The feature is currently <strong>{isFeatureEnabled ? "Enabled" : "Disabled"}</strong>.
+                </p>
                 <ul className="space-y-4">
                     {availableWidgets.map((widget) => (
                         <li key={widget.id} className="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-md shadow">

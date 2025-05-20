@@ -1,313 +1,231 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import {
+  Card, CardContent, CardDescription, CardHeader, CardTitle
+} from "@/components/ui/card";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, PieChart, Pie
+} from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Filter, ArrowUp, ArrowDown } from "lucide-react";
+import { Filter } from "lucide-react";
 
-/**
- * DataVisualizer Component
- * 
- * Renders different chart types based on data analysis:
- * 1. Supports bar charts, line charts, and pie charts
- * 2. Automatically selects appropriate chart type based on data structure
- * 3. Provides tooltips and interactive elements for data exploration
- * 4. Allows filtering by data values and ranges
- * 
- * @param {Object} chartData - Data for rendering charts
- * @param {string} chartType - Type of chart to render (bar, line, pie)
- */
 const DataVisualizer = ({ chartData, chartType = 'bar' }) => {
-    // State for filtered chart data
-    const [filteredData, setFilteredData] = useState([]);
-    // State for filter settings
-    const [filterField, setFilterField] = useState('');
-    const [filterValue, setFilterValue] = useState('');
-    const [filterType, setFilterType] = useState('equals');
-    // State for showing filter panel
-    const [showFilters, setShowFilters] = useState(false);
-    // State for sorting
-    const [sortDirection, setSortDirection] = useState('desc');
-    
-    // Available fields from chart data
-    const [availableFields, setAvailableFields] = useState([]);
-    
-    // Initialize filtered data and available fields when chart data changes
-    useEffect(() => {
-        if (chartData && chartData.length > 0) {
-            setFilteredData(chartData);
-            
-            // Extract all available fields from the first data item
-            const firstItem = chartData[0];
-            const fields = Object.keys(firstItem).filter(key => key !== 'name' && key !== 'value');
-            setAvailableFields(['name', 'value', ...fields]);
-            
-            // Set default filter field to the first available field
-            if (!filterField && fields.length > 0) {
-                setFilterField('value');
-            }
-        } else {
-            setFilteredData([]);
-            setAvailableFields([]);
-        }
-    }, [chartData]);
-    
-    // If no chart data is provided, show placeholder
-    if (!chartData || !Array.isArray(chartData) || chartData.length === 0) {
-        return (
-            <Card>
-                <CardHeader>
-                    <CardTitle>Data Visualization</CardTitle>
-                    <CardDescription>
-                        Ask the AI to generate charts based on your data
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="h-[300px] flex items-center justify-center">
-                    <p className="text-muted-foreground">No visualization data available</p>
-                </CardContent>
-            </Card>
+  const [filteredData, setFilteredData] = useState([]);
+  const [showFilters, setShowFilters] = useState(chartType === 'bar');
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Filter states
+  const [filters, setFilters] = useState({
+    fakturanummer: '',
+    referens: '',
+    fakturatyp: '',
+    fakturaformat: '',
+    valuta: '',
+    mottagare: '',
+    leverantor: ''
+  });
+
+  const [kostnadsstalleList, setKostnadsstalleList] = useState([]);
+  const [dropdownValues, setDropdownValues] = useState({
+    valuta: [],
+    mottagare: [],
+    leverantor: []
+  });
+
+  // Extract dropdown options from CSV data
+  useEffect(() => {
+    if (chartData && chartData.length > 0) {
+      setFilteredData(chartData);
+
+      const getUniqueValues = (key) => [...new Set(chartData.map(item => item[key]).filter(Boolean))];
+
+      const normalizeKey = (label) => {
+        const match = Object.keys(chartData[0] || {}).find(k =>
+          k.trim().toLowerCase() === label.trim().toLowerCase()
         );
+        return match || label;
+      };
+      
+      setDropdownValues({
+        valuta: getUniqueValues(normalizeKey("valuta")),
+        mottagare: getUniqueValues(normalizeKey("mottagare")),
+        leverantor: getUniqueValues(normalizeKey("leverantor"))
+      });      
+      
     }
+  }, [chartData]);
 
-    /**
-     * Apply filters to chart data
-     */
-    const applyFilters = () => {
-        if (!filterField || !filterValue) {
-            // If no filter criteria, reset to original data
-            setFilteredData(chartData);
-            return;
-        }
-        
-        const filtered = chartData.filter(item => {
-            const itemValue = item[filterField];
-            const compareValue = !isNaN(parseFloat(filterValue)) ? parseFloat(filterValue) : filterValue;
-            
-            switch (filterType) {
-                case 'equals':
-                    return String(itemValue).toLowerCase() === String(compareValue).toLowerCase();
-                case 'contains':
-                    return String(itemValue).toLowerCase().includes(String(compareValue).toLowerCase());
-                case 'greater':
-                    return Number(itemValue) > Number(compareValue);
-                case 'less':
-                    return Number(itemValue) < Number(compareValue);
-                default:
-                    return true;
-            }
-        });
-        
-        setFilteredData(filtered);
-    };
-    
-    /**
-     * Reset filters to original data
-     */
-    const resetFilters = () => {
-        setFilterField('value');
-        setFilterValue('');
-        setFilterType('equals');
-        setFilteredData(chartData);
-    };
-    
-    /**
-     * Sort data by value
-     */
-    const sortData = () => {
-        const newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-        setSortDirection(newDirection);
-        
-        const sorted = [...filteredData].sort((a, b) => {
-            return newDirection === 'asc' 
-                ? a.value - b.value 
-                : b.value - a.value;
-        });
-        
-        setFilteredData(sorted);
-    };
+  // Fetch Kostnadsställe from API
+  // Mock Kostnadsställe instead of calling API
+useEffect(() => {
+  async function loadKostnadsstalle() {
+    try {
+      const mockData = [
+        "Marknadsavdelning", "B2B", "Projektledare", "Projekt Crion",
+        "Ekonomi & Redovisning", "Inköp", "Region Väst",
+        "Produktionsavdelning", "Bygg"
+      ];
+      setKostnadsstalleList(mockData);
+    } catch (err) {
+      console.error("Failed to load Kostnadsställe", err);
+    }
+  }
 
-    // Sample colors for pie chart segments
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
-    
-    // Render different chart types based on the chartType prop
-    const renderChart = () => {
-        switch (chartType) {
-            case 'bar':
-                return (
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis 
-                                dataKey="name" 
-                                angle={-45} 
-                                textAnchor="end"
-                                height={60}
-                            />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="value" fill="#3b82f6" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                );
-                
-            case 'line':
-                return (
-                    <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis 
-                                dataKey="name" 
-                                angle={-45} 
-                                textAnchor="end"
-                                height={60}
-                            />
-                            <YAxis />
-                            <Tooltip />
-                            <Line type="monotone" dataKey="value" stroke="#3b82f6" />
-                        </LineChart>
-                    </ResponsiveContainer>
-                );
-                
-            case 'pie':
-                return (
-                    <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                            <Pie
-                                data={filteredData}
-                                cx="50%"
-                                cy="50%"
-                                labelLine={false}
-                                outerRadius={100}
-                                fill="#8884d8"
-                                dataKey="value"
-                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                            >
-                                {filteredData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip />
-                        </PieChart>
-                    </ResponsiveContainer>
-                );
-                
-            default:
-                return (
-                    <div className="h-[300px] flex items-center justify-center">
-                        <p>Unsupported chart type: {chartType}</p>
-                    </div>
-                );
-        }
-    };
+  loadKostnadsstalle();
+}, []);
 
-    return (
-        <Card>
-            <CardHeader>
-                <div className="flex justify-between items-center">
-                    <div>
-                        <CardTitle>
-                            {chartType === 'bar' && 'Bar Chart'}
-                            {chartType === 'line' && 'Line Chart'}
-                            {chartType === 'pie' && 'Pie Chart'}
-                        </CardTitle>
-                        <CardDescription>
-                            Visual representation of your data
-                        </CardDescription>
-                    </div>
-                    <div className="flex gap-2">
-                        <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => setShowFilters(!showFilters)}
-                            className="flex items-center gap-1"
-                        >
-                            <Filter className="h-4 w-4" />
-                            {showFilters ? 'Hide Filters' : 'Show Filters'}
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={sortData}
-                            className="flex items-center gap-1"
-                        >
-                            {sortDirection === 'asc' ? (
-                                <ArrowUp className="h-4 w-4" />
-                            ) : (
-                                <ArrowDown className="h-4 w-4" />
-                            )}
-                            Sort
-                        </Button>
-                    </div>
-                </div>
-                
-                {showFilters && (
-                    <div className="mt-4 p-4 bg-muted/50 rounded-md space-y-3">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div>
-                                <Select 
-                                    value={filterField}
-                                    onValueChange={setFilterField}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select field" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {availableFields.map(field => (
-                                            <SelectItem key={field} value={field}>
-                                                {field}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            
-                            <div>
-                                <Select 
-                                    value={filterType}
-                                    onValueChange={setFilterType}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Filter type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="equals">Equals</SelectItem>
-                                        <SelectItem value="contains">Contains</SelectItem>
-                                        <SelectItem value="greater">Greater than</SelectItem>
-                                        <SelectItem value="less">Less than</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            
-                            <div>
-                                <Input
-                                    placeholder="Filter value..."
-                                    value={filterValue}
-                                    onChange={(e) => setFilterValue(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        
-                        <div className="flex justify-end gap-2">
-                            <Button variant="outline" size="sm" onClick={resetFilters}>
-                                Reset
-                            </Button>
-                            <Button size="sm" onClick={applyFilters}>
-                                Apply Filter
-                            </Button>
-                        </div>
-                    </div>
-                )}
-            </CardHeader>
-            <CardContent>
-                {renderChart()}
-                <div className="mt-2 text-sm text-muted-foreground text-right">
-                    {filteredData.length} of {chartData.length} items shown
-                </div>
-            </CardContent>
-        </Card>
-    );
+
+  const handleApplyFilter = () => {
+    let filtered = chartData;
+
+    if (filters.fakturanummer)
+      filtered = filtered.filter(d => d.Fakturanummer?.toString().includes(filters.fakturanummer));
+
+    if (filters.referens)
+      filtered = filtered.filter(d => d["koparens_referens"]?.toString().includes(filters.referens));
+    
+    if (filters.fakturatyp)
+      filtered = filtered.filter(d => d["fakturatyp"] === filters.fakturatyp);
+
+    if (filters.fakturaformat)
+      filtered = filtered.filter(d => d["fakturaformat"] === filters.fakturaformat);
+
+    if (filters.valuta)
+      filtered = filtered.filter(d => d.Valuta === filters.valuta);
+
+    if (filters.mottagare)
+      filtered = filtered.filter(d => d.Mottagare === filters.mottagare);
+
+    if (filters.leverantor)
+      filtered = filtered.filter(d => d["leverantor"] === filters.leverantor);
+
+    setFilteredData(filtered);
+  };
+
+  const handleChange = (field, value) => {
+    setFilters(prev => ({ ...prev, [field]: value }));
+  };
+
+  const renderBasicFilters = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-scroll ">
+      <Input placeholder="Fakturanummer" onChange={(e) => handleChange("fakturanummer", e.target.value)} />
+      <Input placeholder="Köparens referens" onChange={(e) => handleChange("referens", e.target.value)} />
+
+      <Select onValueChange={(val) => handleChange("fakturatyp", val)}>
+        <SelectTrigger><SelectValue placeholder="Fakturatyp" /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="Debit">Debit</SelectItem>
+          <SelectItem value="Kredit">Kredit</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Select onValueChange={(val) => handleChange("fakturaformat", val)}>
+        <SelectTrigger><SelectValue placeholder="Fakturaformat" /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="PDF">PDF</SelectItem>
+          <SelectItem value="Peppol">Peppol</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
+  const renderAdvancedFilters = () => (
+    <div className="max-h-[550px] overflow-y-scroll border rounded-md p-4 bg-gray-50 dark:bg-gray-800 mt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <Select onValueChange={(val) => handleChange("leverantor", val)}>
+          <SelectTrigger><SelectValue placeholder="Leverantör" className="bg-gradient-to-r"/></SelectTrigger>
+          <SelectContent>
+            {dropdownValues.leverantor.map((val, i) => (
+              <SelectItem key={i} value={val}>{val}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select onValueChange={(val) => handleChange("valuta", val)}>
+          <SelectTrigger><SelectValue placeholder="Valuta" className="bg-[#aff7f0]"/></SelectTrigger>
+          <SelectContent>
+            {dropdownValues.valuta.map((val, i) => (
+              <SelectItem key={i} value={val}>{val}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select onValueChange={(val) => handleChange("mottagare", val)}>
+          <SelectTrigger><SelectValue placeholder="Mottagare" className="bg-[#aff7f0]" /></SelectTrigger>
+          <SelectContent>
+            {dropdownValues.mottagare.map((val, i) => (
+              <SelectItem key={i} value={val}>{val}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select>
+          <SelectTrigger><SelectValue placeholder="Kostnadsställe" /></SelectTrigger>
+          <SelectContent>
+            {kostnadsstalleList.map((val, i) => (
+              <SelectItem key={i} value={val}>{val}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+
+  return (
+    <Card className="relative">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>{chartType === 'bar' ? 'Bar Chart' : 'Pie Chart'}</CardTitle>
+          <CardDescription>Visual representation of your data</CardDescription>
+        </div>
+        {chartType === 'bar' && (
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
+              <Filter className="mr-2 h-4 w-4" />
+              {showFilters ? 'Hide Filters' : 'Show Filters'}
+            </Button>
+          </div>
+        )}
+      </CardHeader>
+      <CardContent>
+        {showFilters && chartType === 'bar' && (
+          <div className="space-y-4 mb-6">
+            {renderBasicFilters()}
+            <div className="flex justify-between items-center pt-2">
+              <Button onClick={handleApplyFilter}>Apply Filter</Button>
+              <Button variant="outline" className="text-sm" onClick={() => setShowAdvanced(!showAdvanced)}>
+                {showAdvanced ? 'Hide Advanced Filter' : 'Advanced Filter'}
+              </Button>
+            </div>
+            {showAdvanced && renderAdvancedFilters()}
+          </div>
+        )}
+        <div className="w-full h-[400px]">
+          {chartType === 'bar' ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={filteredData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="label" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" fill="#26A69A" />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={filteredData} dataKey="value" nameKey="label" cx="50%" cy="50%" outerRadius={100} fill="#8884d8" label />
+                {/* <Pie  dataKey="value" nameKey="label" cx="50%" cy="50%" outerRadius={100} fill="#8884d8" label /> */}
+              </PieChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
 };
 
 export default DataVisualizer;
