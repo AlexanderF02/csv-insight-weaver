@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faBorderAll } from '@fortawesome/free-solid-svg-icons';
 import { ModeToggle } from "./ModeToggle";
+import ProfileDropdown from './ui/ProfileDropdown';
 
 const Navbar = ({ navigateToDashboard }) => {
     const navigate = useNavigate();
@@ -27,12 +28,15 @@ const Navbar = ({ navigateToDashboard }) => {
                 <ModeToggle />
 
                 {/* User Profile Button */}
-                <button
+
+                {/* lägg till logik: om inloggad visa detta, om utloggad navigera till login */}
+                <ProfileDropdown />
+                {/* <button
                     className="p-2 rounded-full hover:bg-opacity-80 text-white"
                     onClick={() => navigate("/login")}
                 >
                     <FontAwesomeIcon icon={faUser} className="h-6 w-6" />
-                </button>
+                </button> */}
             </div>
         </header>
     );

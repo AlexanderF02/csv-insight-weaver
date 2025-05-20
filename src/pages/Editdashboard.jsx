@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Plus, X, User } from "lucide-react";
+import Navbar from "../components/Navbar";
+import { Switch } from "../components/switch";
+import { TabsContent } from "../components/ui/tabs";
 
 
-
-export default function Dashboard() {
+export default function Editdashboard() {
   const [cards, setCards] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const placeholderCards = [
@@ -13,7 +15,6 @@ export default function Dashboard() {
     { id: 'resultat', title: 'Resultatöversikt' },
   ];
   
-
 
   const addCard = (type = null) => {
     const newCard = { id: Date.now(), type };
@@ -29,9 +30,15 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen ">
-      {/* Topbar */}
-      
+      <Navbar />
+      <div className="flex items-center m-5">
+        <p className="mx-2">Dashboard</p>
+        <Switch />
+        <p className="mx-2">Redigering</p>
+      </div>
 
+      
+      
       {/* Header Controls */}
       <div className="flex justify-end items-center gap-4 px-6 py-4 mb-12">
  
@@ -83,9 +90,8 @@ export default function Dashboard() {
     
     </div>
   </div>
+  
 )}
-
-
 
       {/* Card Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-6 pb-6">
@@ -102,8 +108,18 @@ export default function Dashboard() {
         ))}
       </div>
     </div>
+    
   );
 }
+
+
+
+
+
+
+
+
+
 
 
 
