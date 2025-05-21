@@ -1,23 +1,36 @@
 import * as React from "react";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
-import { cn } from "@/lib/utils"; 
+import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
-const Switch = React.forwardRef(({ className, ...props }, ref) => (
-  <SwitchPrimitive.Root
-    ref={ref}
-    className={cn(
-      "peer inline-flex h-[20px] w-[36px] shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-[#26A69A]",
-      className
-    )}
-    {...props}
-  >
-    <SwitchPrimitive.Thumb
+const Switch = React.forwardRef(({ className, onChange, ...props }, ref) => {
+  const navigate = useNavigate();
+
+  const handleCheckedChange = (checked) => {
+    if (onChange) onChange(checked);
+    if (checked) {
+      navigate("/editdashboard");
+    }
+  };
+
+  return (
+    <SwitchPrimitive.Root
+      ref={ref}
       className={cn(
-        "pointer-events-none block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0"
+        "peer inline-flex h-[20px] w-[36px] shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-[#26A69A]",
+        className
       )}
-    />
-  </SwitchPrimitive.Root>
-));
+      onCheckedChange={handleCheckedChange}
+      {...props}
+    >
+      <SwitchPrimitive.Thumb
+        className={cn(
+          "pointer-events-none block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0"
+        )}
+      />
+    </SwitchPrimitive.Root>
+  );
+});
 Switch.displayName = SwitchPrimitive.Root.displayName;
 
 export { Switch };
