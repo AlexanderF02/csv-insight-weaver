@@ -3,3 +3,198 @@ import App from './App.tsx'
 import './index.css'
 
 createRoot(document.getElementById("root")!).render(<App />);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faBorderAll, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { ModeToggle } from "./ModeToggle";
+import ProfileDropdown from "./ui/ProfileDropdown";
+
+const Navbar = ({ navigateToDashboard, setIsModalOpen }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [loggedInUser, setLoggedInUser] = useState(null);
+    const [loggedInUserCompany, setLoggedInUserCompany] = useState(null);
+
+    useEffect(() => {
+        const user = localStorage.getItem('loggedInUser');
+        const company = localStorage.getItem('loggedInUserCompany');
+        setLoggedInUser(user);
+        setLoggedInUserCompany(company);
+    }, [location.pathname]);
+
+    const handleLogout = () => {
+        localStorage.removeItem('loggedInUser');
+        localStorage.removeItem('loggedInUserCompany');
+        setLoggedInUser(null);
+        setLoggedInUserCompany(null);
+        navigate('/login');
+    };
+
+    const handleProfileClick = () => {
+        if (loggedInUser) {
+            setIsDropdownOpen((prev) => !prev);
+        } else {
+            navigate('/login');
+        }
+    };
+
+    // This will open the upload modal
+    const handleNewAnalysis = () => {
+        if (setIsModalOpen) {
+            setIsModalOpen(true);
+        }
+    };
+
+    return (
+        <header className="text-white py-4 px-6 shadow-md flex items-center justify-between dark:bg-gray-800" style={{ backgroundColor: '#26A69A' }}>
+            <div className="flex items-center space-x-4">
+                <img src="/esyn.png" alt="Logo" className="h-8 w-auto" />
+                {/* Dashboard Button - moved next to logo */}
+                <button
+                    className="flex items-center bg-white text-gray-800 py-2 px-4 rounded-md shadow hover:bg-gray-100 dark:bg-gray-800 dark:text-white"
+                    onClick={navigateToDashboard}
+                >
+                    Dashboard
+                    <FontAwesomeIcon icon={faBorderAll} className="h-5 w-5 ml-2" />
+                </button>
+            </div>
+
+            <div className="flex items-center space-x-4">
+                {/* Dark Mode/Light Mode Toggle */}
+                <ModeToggle />
+
+                {/* User Profile Button */}
+                <div className="relative">
+                    <button
+                        className="flex items-center gap-2 bg-white text-gray-800 py-2 px-4 rounded-md shadow hover:bg-gray-100 dark:bg-gray-800 dark:text-white transition"
+                        onClick={handleProfileClick}
+                        title={loggedInUser || "Profil"}
+                    >
+                        <span>Profil</span>
+                        <FontAwesomeIcon icon={faUser} className="h-5 w-5" />
+                    </button>
+                    {/* Dropdown Menu (only visible when logged in) */}
+                    {loggedInUser && (
+                        <ProfileDropdown
+                            isDropdownOpen={isDropdownOpen}
+                            loggedInUser={loggedInUser}
+                            loggedInUserCompany={loggedInUserCompany}
+                            handleLogout={handleLogout}
+                        />
+                    )}
+                </div>
+
+                {/* Ny analys Button - always show text, black background, only + icon */}
+                <button
+                    className="flex items-center gap-2 bg-gray-800 text-white py-2 px-4 rounded-md shadow hover:bg-gray-900 transition"
+                    onClick={handleNewAnalysis}
+                >
+                    <FontAwesomeIcon icon={faPlus} className="h-5 w-5" />
+                    <span>Ny analys</span>
+                </button>
+            </div>
+        </header>
+    );
+};
+
+export default Navbar;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/Avatar";
+
+const ProfileDropdown = ({
+  isDropdownOpen,
+  loggedInUser,
+  loggedInUserCompany,
+  handleLogout,
+}) => {
+  const navigate = useNavigate();
+
+  // Get initials from company name or fallback
+  const getInitials = (name) => {
+    if (!name) return "AB";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  return (
+    <div
+      className={`absolute right-0 mt-2 w-64 bg-[#262C2E] text-white rounded-xl shadow-lg z-50 transition-all duration-300 transform ${
+        isDropdownOpen
+          ? "opacity-100 scale-100 translate-y-0"
+          : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+      }`}
+    >
+      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+        <div>
+          <div className="font-semibold">{loggedInUser || "Användare"}</div>
+          <div className="text-sm text-gray-400">{loggedInUserCompany || "No Company"}</div>
+        </div>
+        <Avatar className="h-12 w-12">
+          <AvatarImage src="https://github.com/shadcn.png" alt="User Avatar" />
+          <AvatarFallback>
+            {getInitials(loggedInUserCompany)}
+          </AvatarFallback>
+        </Avatar>
+      </div>
+      <div className="p-4 space-y-2">
+        <button
+          className="w-full text-center hover:text-teal-300"
+          onClick={() => navigate("/profile")}
+        >
+          Kontoinställningar
+        </button>
+        <button
+          className="w-full text-center hover:text-teal-300"
+          onClick={() => navigate("/savedanalys")}
+        >
+          Sparade analyser
+        </button>
+        <button
+          className="w-full text-center hover:text-red-400"
+          onClick={handleLogout}
+        >
+          Logga ut
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default ProfileDropdown;

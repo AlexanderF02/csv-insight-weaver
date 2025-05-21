@@ -8,45 +8,47 @@ import DataVisualizer from '../components/DataVisualizer';
 import FileUpload from '../components/FileUpload';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { useToast } from "../hooks/use-toast";
-import { Switch } from "@/components/ui/switch"; // Import the Switch component
+import { Switch } from "@/components/ui/switch";
 import Navbar from "../components/Navbar";
-import { Calendar } from "@/components/Calendar"; // Import the custom ShadCN Calendar component
+import { Calendar } from "@/components/Calendar";
 
 const Index = () => {
     const navigate = useNavigate();
 
     const [data, setData] = useState(null);
     const [allCsvFiles, setAllCsvFiles] = useState([]);
-    const [activeTab, setActiveTab] = useState('dashboard'); 
+    const [activeTab, setActiveTab] = useState('dashboard');
     const [chartData, setChartData] = useState({ bar: [], pie: [], line: [] });
-    const [keyInfo, setKeyInfo] = useState([]); 
-    const [totalAmount, setTotalAmount] = useState(0); 
-    const [uniqueCompanies, setUniqueCompanies] = useState(0); 
+    const [keyInfo, setKeyInfo] = useState([]);
+    const [totalAmount, setTotalAmount] = useState(0);
+    const [uniqueCompanies, setUniqueCompanies] = useState(0);
     const { toast } = useToast();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isFeatureEnabled, setIsFeatureEnabled] = useState(false); 
-    const [editMode, setEditMode] = useState(false); 
-    const [startDate, setStartDate] = useState(new Date()); 
-    const [endDate, setEndDate] = useState(new Date()); 
-    const [isCalendarOpen, setIsCalendarOpen] = useState(false); 
-    const [isSelectingStartDate, setIsSelectingStartDate] = useState(true); 
+    const [isFeatureEnabled, setIsFeatureEnabled] = useState(false);
+    const [editMode, setEditMode] = useState(false);
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+    const [isSelectingStartDate, setIsSelectingStartDate] = useState(true);
 
     const handleSwitchChange = (checked) => {
-        setIsFeatureEnabled(checked);
-        setEditMode(checked); 
-    };
+    setIsFeatureEnabled(checked);
+    setEditMode(checked);
+    if (checked) {
+        navigate("/editdashboard");
+    }
+};
 
     const handleDataLoaded = (csvData) => {
         setData(csvData);
 
-        
         setAllCsvFiles(prevFiles => [...prevFiles, csvData]);
 
         if (csvData && csvData.headers && csvData.rows && csvData.rows.length > 0) {
             // Extract key columns
-            const companyColumn = 'mottagare'; 
-            const amountColumn = 'totalbelopp'; 
-            const dateColumn = 'fakturadatum'; 
+            const companyColumn = 'mottagare';
+            const amountColumn = 'totalbelopp';
+            const dateColumn = 'fakturadatum';
 
             // Process data for charts
             const barChartData = csvData.rows.reduce((acc, row) => {
@@ -88,7 +90,7 @@ const Index = () => {
                 id: row['fakturanummer'] || 'N/A',
             }));
 
-            setKeyInfo(keyInfo); 
+            setKeyInfo(keyInfo);
 
             // Calculate total amount and unique companies
             const totalAmount = csvData.rows.reduce((sum, row) => {
@@ -103,7 +105,7 @@ const Index = () => {
         }
 
         setIsModalOpen(false);
-        setActiveTab('dashboard'); 
+        setActiveTab('dashboard');
 
         toast({
             title: "CSV Loaded Successfully",
@@ -112,12 +114,12 @@ const Index = () => {
     };
 
     const navigateToDashboard = () => {
-        setActiveTab('dashboard'); 
+        setActiveTab('dashboard');
     };
 
     return (
         <div className="min-h-screen flex flex-col bg-appGray-light dark:bg-gray-900 dark:text-white">
-            <Navbar navigateToDashboard={navigateToDashboard} />
+            <Navbar navigateToDashboard={navigateToDashboard} setIsModalOpen={setIsModalOpen} />
 
             {/* Switch positioned below the Navbar */}
             <div className="flex items-center space-x-2 mt-4 ml-4">
@@ -125,7 +127,7 @@ const Index = () => {
                 <Switch
                     id="feature-switch"
                     checked={isFeatureEnabled}
-                    onChange={handleSwitchChange}
+                    onCheckedChange={handleSwitchChange}
                 />
                 <span className="text-sm text-black dark:text-white">Redigering</span>
             </div>
@@ -149,9 +151,9 @@ const Index = () => {
 
                             {/* Dashboard Content */}
                             <TabsContent value="dashboard" className="space-y-6">
-                                
+
                                 <div className="dashboard-card flex justify-between items-center p-6 rounded-lg shadow-lg bg-gradient-to-r from bg-[#26A69A] text-white mb-6">
-                                    
+
                                     <div className="flex items-center">
                                         <img src="/esyn.png" alt="Logo" className="h-12 w-auto mr-4" />
                                         <div>
@@ -195,11 +197,11 @@ const Index = () => {
                                                     selected={isSelectingStartDate ? startDate : endDate}
                                                     onSelect={(selectedDate) => {
                                                         if (isSelectingStartDate) {
-                                                            setStartDate(selectedDate); 
-                                                            setIsSelectingStartDate(false); 
+                                                            setStartDate(selectedDate);
+                                                            setIsSelectingStartDate(false);
                                                         } else {
-                                                            setEndDate(selectedDate); 
-                                                            setIsCalendarOpen(false); 
+                                                            setEndDate(selectedDate);
+                                                            setIsCalendarOpen(false);
                                                         }
                                                     }}
                                                     modifiers={{
@@ -252,14 +254,7 @@ const Index = () => {
                 </section>
             </main>
 
-            {/* Ny analys button positioned slightly above the footer */}
-            <button
-                className="fixed bottom-16 right-4 bg-[#26A69A] text-white p-4 rounded-full shadow hover:bg-opacity-90 flex items-center justify-center group transform transition-transform duration-500 hover:scale-110"
-                onClick={() => setIsModalOpen(true)}
-            >
-                <span className="hidden group-hover:inline-block mr-2 text-sm">Ny analys</span>
-                <FontAwesomeIcon icon={faPlus} className="h-6 w-6" />
-            </button>
+            {/* REMOVE the floating Ny analys button here */}
 
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
