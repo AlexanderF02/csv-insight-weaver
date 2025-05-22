@@ -47,11 +47,11 @@ const Navbar = ({ navigateToDashboard, setIsModalOpen }) => {
     };
 
     return (
-        <header className="text-white py-4 px-6 shadow-md flex items-center justify-between dark:bg-gray-800" style={{ backgroundColor: '#26A69A' }}>
+        <header className="text-white py-4 px-6 shadow-md flex items-center justify-between bg-gray-800 dark:bg-[#26A69A]">
             <div className="flex items-center space-x-4">
-                <img src="/esyn.png" alt="Logo" className="h-8 w-auto" />
+                <img src="/EsynLogga.svg" alt="Logo" className="h-8 w-auto" />
                 <button
-                    className="flex items-center bg-white text-gray-800 py-2 px-4 rounded-md shadow hover:bg-gray-100 dark:bg-gray-800 dark:text-white"
+                    className="flex items-center bg-gray-800 text-white py-2 px-4 rounded-md shadow hover:bg-gray-900"
                     onClick={navigateToDashboard}
                 >
                     Dashboard
@@ -64,12 +64,12 @@ const Navbar = ({ navigateToDashboard, setIsModalOpen }) => {
 
                 <div className="relative">
                     <button
-                        className="flex items-center gap-2 bg-white text-gray-800 py-2 px-4 rounded-md shadow hover:bg-gray-100 dark:bg-gray-800 dark:text-white transition"
+                        className={`flex items-center gap-2 bg-gray-800 text-white py-2 px-4 rounded-md shadow hover:bg-gray-900 transition ${isDropdownOpen ? 'text-[#26A69A]' : ''}`}
                         onClick={handleProfileClick}
                         title={loggedInUser || "Profil"}
                     >
                         <span>Profil</span>
-                        <FontAwesomeIcon icon={faUser} className="h-5 w-5" />
+                        <FontAwesomeIcon icon={faUser} className={`h-5 w-5 ${isDropdownOpen ? 'text-[#26A69A]' : ''}`} />
                     </button>
                     {loggedInUser && (
                         <ProfileDropdown
@@ -83,7 +83,7 @@ const Navbar = ({ navigateToDashboard, setIsModalOpen }) => {
                 </div>
 
                 <button
-                    className="flex items-center gap-2 bg-gray-800 text-white py-2 px-4 rounded-md shadow hover:bg-gray-900 transition"
+                    className="flex items-center gap-2 bg-[#26A69A] text-white py-2 px-4 rounded-md shadow hover:bg-[#219080] transition dark:bg-gray-800 dark:hover:bg-gray-900"
                     onClick={handleNewAnalysis}
                 >
                     <FontAwesomeIcon icon={faPlus} className="h-5 w-5" />

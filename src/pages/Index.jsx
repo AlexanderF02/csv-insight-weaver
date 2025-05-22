@@ -270,12 +270,6 @@ const Index = () => {
                     </div>
                 </div>
             )}
-
-            <footer className="text-white py-4 dark:bg-gray-800" style={{ backgroundColor: '#26A69A' }}>
-                <div className="container mx-auto px-4 sm:px-6 text-center">
-                    <p>&copy; {new Date().getFullYear()} eSyn Cloud. All Rights Reserved. Powered by Sitea</p>
-                </div>
-            </footer>
         </div>
     );
 };
