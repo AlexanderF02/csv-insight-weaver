@@ -31,7 +31,8 @@ const ProfileDropdown = ({
     >
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         <div>
-          <div className="font-semibold">{loggedInUser || "Användare"}</div>
+          <div className="font-semibold">{localStorage.getItem("loggedInUserName") || "Användare"}</div>
+          
           <div className="text-sm text-gray-400">{loggedInUserCompany || "No Company"}</div>
         </div>
         <Avatar className="h-12 w-12">
@@ -43,19 +44,19 @@ const ProfileDropdown = ({
       </div>
       <div className="p-4 space-y-2">
         <button
-          className="w-full text-center hover:text-teal-300"
+          className="w-full text-center hover:bg-[#87D4CE33] rounded-sm py-2 px-[42px] active:bg-[#87D4CE57]"
           onClick={() => navigate("/profile")}
         >
           Kontoinställningar
         </button>
         <button
-          className="w-full text-center hover:text-teal-300"
+          className="w-full text-center hover:bg-[#87D4CE33] rounded-sm py-2 px-[42px] active:bg-[#87D4CE57]"
           onClick={handleSavedAnalys} 
         >
           Sparade analyser
         </button>
         <button
-          className="w-full text-center hover:text-red-400"
+          className="w-full text-center hover:bg-[#87D4CE33] rounded-sm py-2 px-[42px] active:bg-[#87D4CE57]"
           onClick={handleLogout}
         >
           Logga ut

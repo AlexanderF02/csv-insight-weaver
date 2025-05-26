@@ -29,31 +29,33 @@ export default function Editdashboard() {
   };
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen flex flex-col bg-appGray-light dark:bg-gray-900 dark:text-white">
       <Navbar />
-      <div className="flex items-center m-5">
-        <p className="mx-2">Dashboard</p>
+      <div className="flex items-center space-x-2 mt-[40px] mb-[40px] ml-4">
+        <span className="text-sm text-black dark:text-white">Dashboard</span>
         <Switch checked={true} onCheckedChange={handleSwitchChange} />
-        <p className="mx-2">Redigering</p>
+        <span className="text-sm text-black dark:text-white">Redigering</span>
       </div>
 
       {/* Header Controls */}
-      <div className="flex justify-end items-center gap-4 px-6 py-4 mb-12">
+      <div className="flex justify-end items-center gap-4 px-6 py-4 mb-[40px]">
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center bg-black px-3 py-2 rounded-xl shadow text-white"
+          className="flex items-center bg-[#262C2E] px-3 py-2 rounded-lg shadow text-white"
         >
           <Plus className="mr-2" /> Lägg till analyskort
         </button>
 
         <button
           onClick={clearCards}
-          className="flex items-center bg-black px-3 py-2 rounded-xl shadow text-white"
+          className="flex items-center bg-[#262C2E] px-3 py-2 rounded-lg shadow text-white"
         >
           Rensa allt
           <X className="ml-2" />
         </button>
       </div>
+
+      <main className="container mx-auto px-4 sm:px-6 py-8 flex-grow flex"  >
 
       {showModal && (
         <div
@@ -78,7 +80,7 @@ export default function Editdashboard() {
             </p>
             <button
               onClick={addCard}
-              className="flex items-center bg-black px-3 py-2 mt-5 rounded-xl shadow text-white"
+              className="flex items-center bg-[#262C2E] px-3 py-2 mt-5 rounded-lg shadow text-white"
             >
               <Plus className="mr-2" /> Lägg till analyskort
             </button>
@@ -100,6 +102,7 @@ export default function Editdashboard() {
           </div>
         ))}
       </div>
+      </main>
     </div>
   );
 }
