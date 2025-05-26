@@ -1,3 +1,4 @@
+// Merged and cleaned version
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
@@ -20,12 +21,12 @@ import { Badge } from '@/components/ui/badge';
 
 // Sample data to show initially
 const sampleData = [
-    { fakturanummer: '5003774819', mottagare: 'ACME 11 AB', totalbelopp: 1951.31, momsbelopp: 487.83, fakturabelopp: 2439, valuta: 'SEK', fakturadatum: '2025-01-01', fakturatyp: 'Invoice', fakturaformat: 'PDF' },
-    { fakturanummer: '5003787411', mottagare: 'ACME 25 AB', totalbelopp: 2174.58, momsbelopp: 284.25, fakturabelopp: 1421, valuta: 'SEK', fakturadatum: '2025-01-01', fakturatyp: 'Invoice', fakturaformat: 'PDF' },
-    { fakturanummer: '5003778225', mottagare: 'ACME 52 AB', totalbelopp: 4440.9, momsbelopp: 944.08, fakturabelopp: 4720, valuta: 'SEK', fakturadatum: '2025-01-01', fakturatyp: 'Invoice', fakturaformat: 'PDF' },
-    { fakturanummer: '5003774821', mottagare: 'ACME 11 AB', totalbelopp: 2150.31, momsbelopp: 456.83, fakturabelopp: 2607, valuta: 'SEK', fakturadatum: '2025-02-15', fakturatyp: 'Invoice', fakturaformat: 'PDF' },
-    { fakturanummer: '5003787415', mottagare: 'ACME 25 AB', totalbelopp: 3264.58, momsbelopp: 652.25, fakturabelopp: 3917, valuta: 'SEK', fakturadatum: '2025-02-28', fakturatyp: 'Invoice', fakturaformat: 'Peppol' },
-    { fakturanummer: '7003787415', mottagare: 'Test AB', totalbelopp: 123264.58, momsbelopp: 123652.25, fakturabelopp: 323917, valuta: 'SEK', fakturadatum: '2025-05-26', fakturatyp: 'Debit', fakturaformat: 'Peppol' }
+{ fakturanummer: '5003774819', mottagare: 'ACME 11 AB', totalbelopp: 1951.31, momsbelopp: 487.83, fakturabelopp: 2439, valuta: 'SEK', fakturadatum: '2025-01-01', fakturatyp: 'Invoice', fakturaformat: 'PDF' },
+{ fakturanummer: '5003787411', mottagare: 'ACME 25 AB', totalbelopp: 2174.58, momsbelopp: 284.25, fakturabelopp: 1421, valuta: 'SEK', fakturadatum: '2025-01-01', fakturatyp: 'Invoice', fakturaformat: 'PDF' },
+{ fakturanummer: '5003778225', mottagare: 'ACME 52 AB', totalbelopp: 4440.9, momsbelopp: 944.08, fakturabelopp: 4720, valuta: 'SEK', fakturadatum: '2025-01-01', fakturatyp: 'Invoice', fakturaformat: 'PDF' },
+{ fakturanummer: '5003774821', mottagare: 'ACME 11 AB', totalbelopp: 2150.31, momsbelopp: 456.83, fakturabelopp: 2607, valuta: 'SEK', fakturadatum: '2025-02-15', fakturatyp: 'Invoice', fakturaformat: 'PDF' },
+{ fakturanummer: '5003787415', mottagare: 'ACME 25 AB', totalbelopp: 3264.58, momsbelopp: 652.25, fakturabelopp: 3917, valuta: 'SEK', fakturadatum: '2025-02-28', fakturatyp: 'Invoice', fakturaformat: 'Peppol' },
+{ fakturanummer: '7003787415', mottagare: 'Test AB', totalbelopp: 123264.58, momsbelopp: 123652.25, fakturabelopp: 323917, valuta: 'SEK', fakturadatum: '2025-05-26', fakturatyp: 'Debit', fakturaformat: 'Peppol' }
 ];
 
 const Index = () => {
