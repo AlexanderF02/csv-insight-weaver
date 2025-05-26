@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
-import { useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
+import { Plus, Filter, X } from 'lucide-react';
+
+import Navbar from "../components/Navbar";
+import CSVUploader from '../components/CSVUploader.jsx';
 import DataTable from '../components/DataTable';
 import AIInsights from '../components/AIInsights';
 import DataVisualizer from '../components/DataVisualizer';
+<<<<<<< Updated upstream
 import FileUpload from '../components/FileUpload';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { useToast } from "../hooks/use-toast";
@@ -100,16 +106,109 @@ const Index = () => {
 
             setTotalAmount(totalAmount);
             setUniqueCompanies(uniqueCompanies);
-        }
+=======
+import FilterPanel from '../components/FilterPanel.jsx';
 
+// Sample dummy data
+const sampleData = [
+    { fakturanummer: '5003774819', mottagare: 'ACME 11 AB', totalbelopp: 1951.31, momsbelopp: 487.83, fakturabelopp: 2439, valuta: 'SEK', fakturadatum: '2025-01-01', fakturatyp: 'Invoice', fakturaformat: 'PDF' },
+    { fakturanummer: '5003787411', mottagare: 'ACME 25 AB', totalbelopp: 2174.58, momsbelopp: 284.25, fakturabelopp: 1421, valuta: 'SEK', fakturadatum: '2025-01-01', fakturatyp: 'Invoice', fakturaformat: 'PDF' },
+    { fakturanummer: '5003778225', mottagare: 'ACME 52 AB', totalbelopp: 4440.9, momsbelopp: 944.08, fakturabelopp: 4720, valuta: 'SEK', fakturadatum: '2025-01-01', fakturatyp: 'Invoice', fakturaformat: 'PDF' },
+    { fakturanummer: '5003774821', mottagare: 'ACME 11 AB', totalbelopp: 2150.31, momsbelopp: 456.83, fakturabelopp: 2607, valuta: 'SEK', fakturadatum: '2025-02-15', fakturatyp: 'Invoice', fakturaformat: 'PDF' },
+    { fakturanummer: '5003787415', mottagare: 'ACME 25 AB', totalbelopp: 3264.58, momsbelopp: 652.25, fakturabelopp: 3917, valuta: 'SEK', fakturadatum: '2025-02-28', fakturatyp: 'Invoice', fakturaformat: 'Peppol' },
+    { fakturanummer: '7003787415', mottagare: 'Test AB', totalbelopp: 123264.58, momsbelopp: 123652.25, fakturabelopp: 323917, valuta: 'SEK', fakturadatum: '2025-05-26', fakturatyp: 'Debit', fakturaformat: 'Peppol' },
+];
+
+const ActiveFilters = ({ filters, removeFilter }) => {
+const activeFilters = Object.entries(filters).filter(([_, value]) => value !== null && value !== '' && !(Array.isArray(value) && value[0] === null && value[1] === null));
+if (activeFilters.length === 0) return null;
+
+return (
+    <div className="mb-6 bg-dark-300 rounded-lg p-4">
+    <div className="flex items-center mb-2">
+        <Filter size={16} className="mr-2 text-teal-500" />
+        <h3 className="text-sm font-medium text-white">Active filters</h3>
+    </div>
+    <div className="flex flex-wrap gap-2 mt-2">
+        {activeFilters.map(([key, value]) => (
+        <Badge key={key} variant="outline" className="flex items-center gap-1 bg-dark-200 text-white border-teal-500/30 pl-2">
+            <span className="text-xs font-normal">
+            {key}:&nbsp;
+            {Array.isArray(value)
+                ? `${value[0] ? format(value[0], 'yyyy-MM-dd') : 'any'} to ${value[1] ? format(value[1], 'yyyy-MM-dd') : 'any'}`
+                : String(value)}
+            </span>
+            <button className="ml-1 hover:bg-teal-500/20 rounded-full p-0.5" onClick={() => removeFilter(key)}>
+            <X size={12} className="text-teal-400" />
+            </button>
+        </Badge>
+        ))}
+    </div>
+    </div>
+);
+};
+
+const Index = () => {
+const [isUploadOpen, setIsUploadOpen] = useState(false);
+const [activeTab, setActiveTab] = useState('dashboard');
+const [dashboardState, setDashboardState] = useState({
+    data: sampleData,
+    filters: {
+    isOpen: false,
+    activeFilters: {}
+    }
+});
+
+useEffect(() => {
+    if (dashboardState.data.length > 0) {
+    const fields = Object.keys(dashboardState.data[0]);
+    const initialFilters = Object.fromEntries(fields.map(field => [field, null]));
+    setDashboardState(prev => ({
+        ...prev,
+        filters: {
+        ...prev.filters,
+        activeFilters: initialFilters
+>>>>>>> Stashed changes
+        }
+    }));
+    }
+}, [dashboardState.data]);
+
+<<<<<<< Updated upstream
         setIsModalOpen(false);
         setActiveTab('dashboard'); 
+=======
+const filteredData = useMemo(() => {
+    return dashboardState.data.filter(item => {
+    return Object.entries(dashboardState.filters.activeFilters).every(([field, filterValue]) => {
+        if (filterValue === null || filterValue === '' || filterValue === undefined) return true;
+        const itemValue = item[field];
+        if (Array.isArray(filterValue) && filterValue.length === 2) {
+        const [start, end] = filterValue;
+        if (!start && !end) return true;
+        const itemDate = new Date(itemValue);
+        if (start && !end) return itemDate >= start;
+        if (!start && end) return itemDate <= end;
+        return itemDate >= start && itemDate <= end;
+        }
+        return String(itemValue).toLowerCase() === String(filterValue).toLowerCase();
+    });
+    });
+}, [dashboardState]);
+>>>>>>> Stashed changes
 
-        toast({
-            title: "CSV Loaded Successfully",
-            description: `Loaded ${csvData.rows.length} rows with ${csvData.headers.length} columns`
-        });
+const removeFilter = (key) => {
+    setDashboardState(prev => {
+    const updated = { ...prev.filters.activeFilters };
+    updated[key] = null;
+    return {
+        ...prev,
+        filters: {
+        ...prev.filters,
+        activeFilters: updated
+        }
     };
+<<<<<<< Updated upstream
 
     const navigateToDashboard = () => {
         setActiveTab('dashboard'); 
@@ -286,3 +385,97 @@ const Index = () => {
 };
 
 export default Index;
+=======
+    });
+    toast.info(`Filter removed: ${key}`);
+};
+
+const applyFilters = (filters) => {
+    setDashboardState(prev => ({
+    ...prev,
+    filters: {
+        ...prev.filters,
+        activeFilters: filters
+    }
+    }));
+    const count = Object.values(filters).filter(val => val !== null && val !== '' && !(Array.isArray(val) && val[0] === null && val[1] === null)).length;
+    count > 0 ? toast.success(`Filters applied: ${count}`) : toast.info("All filters cleared");
+};
+
+const lineChartData = useMemo(() => {
+    const grouped = {};
+    filteredData.forEach(item => {
+    const date = item.fakturadatum;
+    const amount = parseFloat(item.totalbelopp);
+    if (date) {
+        if (!grouped[date]) grouped[date] = 0;
+        grouped[date] += amount;
+    }
+    });
+    return Object.entries(grouped).map(([date, value]) => ({ name: date, value }));
+}, [filteredData]);
+
+return (
+    <div className="min-h-screen flex flex-col bg-appGray-light dark:bg-gray-900 dark:text-white">
+    <Navbar setIsModalOpen={setIsUploadOpen} />
+    <main className="container mx-auto px-4 sm:px-6 py-8 flex-grow flex">
+        <section className="w-full">
+        {/* Filter Button */}
+        <div className="flex justify-end mb-4">
+            <button
+            onClick={() => setDashboardState(prev => ({
+                ...prev,
+                filters: { ...prev.filters, isOpen: true }
+            }))}
+            className="flex items-center bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-md shadow"
+            >
+            <Filter className="mr-2 h-4 w-4" />
+            Filter
+            </button>
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto mb-8">
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="data">Data Table</TabsTrigger>
+            <TabsTrigger value="insights">AI Insights</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="dashboard" className="space-y-6">
+            <ActiveFilters filters={dashboardState.filters.activeFilters} removeFilter={removeFilter} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <DataVisualizer chartData={filteredData.map(d => ({ name: d.mottagare, value: d.totalbelopp }))} chartType="bar" />
+                <DataVisualizer chartData={filteredData.map(d => ({ name: d.mottagare, value: d.fakturabelopp }))} chartType="pie" />
+            </div>
+            <DataVisualizer chartData={lineChartData} chartType="line" />
+            </TabsContent>
+
+            <TabsContent value="data" className="space-y-6">
+            <ActiveFilters filters={dashboardState.filters.activeFilters} removeFilter={removeFilter} />
+            <DataTable data={filteredData} />
+            </TabsContent>
+
+            <TabsContent value="insights" className="space-y-6">
+            <ActiveFilters filters={dashboardState.filters.activeFilters} removeFilter={removeFilter} />
+            <AIInsights data={filteredData} />
+            </TabsContent>
+        </Tabs>
+        </section>
+    </main>
+
+    <FilterPanel
+        isOpen={dashboardState.filters.isOpen}
+        onClose={() => setDashboardState(prev => ({
+        ...prev,
+        filters: { ...prev.filters, isOpen: false }
+        }))}
+        data={dashboardState.data}
+        onApplyFilters={applyFilters}
+        activeFilters={dashboardState.filters.activeFilters}
+    />
+    </div>
+);
+};
+
+export default Index;
+>>>>>>> Stashed changes
