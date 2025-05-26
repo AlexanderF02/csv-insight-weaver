@@ -22,7 +22,7 @@ const Register = () => {
 
         
         setTimeout(() => {
-            setShowSuccess(false);
+            setShowSuccess(false); 
             navigate('/login');
         }, 1000); 
     };
