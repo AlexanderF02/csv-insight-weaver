@@ -22,19 +22,19 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/savedcsv" element={<Savedcsv />} />
-            <Route path="/editdashboard" element={<Editdashboard />} />
-            <Route path="/savedanalys" element={<SavedAnalys />} />
-            <Route path="*" element={<Login />} />
-          </Routes>
-        </BrowserRouter>
+<BrowserRouter>
+  <Routes>
+    <Route path="/" element={<Index />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Register />} />
+    <Route path="/profile" element={<Profile />} />
+    <Route path="/dashboard" element={<Dashboard />} />
+    <Route path="/savedcsv" element={<Savedcsv />} />
+    <Route path="/editdashboard" element={<Editdashboard />} />
+    <Route path="/savedanalys" element={<SavedAnalys />} />
+    <Route path="*" element={<Login />} />
+  </Routes>
+</BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   </ThemeProvider>
