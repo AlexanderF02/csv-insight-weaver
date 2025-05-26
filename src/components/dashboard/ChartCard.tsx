@@ -1,17 +1,16 @@
-
 import { useState } from 'react';
 import { 
   PieChart, Pie, BarChart, Bar, XAxis, YAxis, Tooltip, 
-  CartesianGrid, ResponsiveContainer, Cell, Legend
+  CartesianGrid, ResponsiveContainer, Cell, Legend, LineChart as RechartsLineChart, Line
 } from 'recharts';
-import { DataItem } from '@/types';
+
 import { Button } from '@/components/ui/button';
 import { SlidersHorizontal, ArrowDownUp } from 'lucide-react';
 
 interface ChartCardProps {
   title: string;
   data: DataItem[];
-  type: 'pie' | 'bar';
+  type: 'pie' | 'bar' | 'line';  // added 'line'
   dataKey: string;
   nameKey: string;
   filterKey?: string;
@@ -38,7 +37,6 @@ const ChartCard = ({
 
   // Format data for the chart - aggregate by nameKey for better visualization
   const aggregatedData = filteredData.reduce((acc, item) => {
-    // Get name and value, accounting for case sensitivity in field names
     const name = item[nameKey] || item[nameKey.toLowerCase()] || item[nameKey.charAt(0).toUpperCase() + nameKey.slice(1)];
     const rawValue = item[dataKey] || item[dataKey.toLowerCase()] || item[dataKey.charAt(0).toUpperCase() + dataKey.slice(1)];
     
@@ -56,24 +54,12 @@ const ChartCard = ({
     acc[nameStr].value += value;
     return acc;
   }, {} as Record<string, { name: string, value: number }>);
-  
+
   const chartData = Object.values(aggregatedData)
-    .filter(item => item.value > 0) // Filter out zero values
-    .sort((a, b) => b.value - a.value); // Sort by value descending
-  
-  // Limit to top 10 for better visualization
+    .filter(item => item.value > 0)
+    .sort((a, b) => b.value - a.value);
+
   const limitedChartData = chartData.slice(0, 10);
-  
-  // Debug info
-  console.log('Chart data for', title, { 
-    dataLength: data.length,
-    filteredLength: filteredData.length,
-    chartDataLength: chartData.length, 
-    limitedDataLength: limitedChartData.length,
-    dataKey, 
-    nameKey,
-    sampleData: data.length > 0 ? data[0] : null
-  });
 
   return (
     <div className="bg-dark-400 rounded-lg p-6 shadow-lg">
@@ -87,10 +73,7 @@ const ChartCard = ({
           >
             <SlidersHorizontal size={16} />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-          >
+          <Button variant="ghost" size="sm">
             <ArrowDownUp size={16} />
           </Button>
         </div>
@@ -114,19 +97,16 @@ const ChartCard = ({
                   label={({ name, percent }) => `${name.substring(0, 10)}${name.length > 10 ? '...' : ''}: ${(percent * 100).toFixed(0)}%`}
                 >
                   {limitedChartData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={COLORS[index % COLORS.length]} 
-                    />
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip 
                   formatter={(value: number) => new Intl.NumberFormat('sv-SE').format(value)}
                   labelFormatter={(name) => `${name}`}
                 />
-                <Legend layout="vertical" verticalAlign="bottom" align="center" />
+                <Legend layout="horizontal" verticalAlign="bottom" align="center" />
               </PieChart>
-            ) : (
+            ) : type === 'bar' ? (
               <BarChart data={limitedChartData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis 
@@ -149,6 +129,28 @@ const ChartCard = ({
                   ))}
                 </Bar>
               </BarChart>
+            ) : (
+              // Line chart block (for type === 'line')
+              <RechartsLineChart data={limitedChartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis 
+                  dataKey="name" 
+                  tickFormatter={(value) => value.length > 10 ? `${value.substring(0, 10)}...` : value} 
+                />
+                <YAxis />
+                <Tooltip 
+                  formatter={(value: number) => new Intl.NumberFormat('sv-SE').format(value)}
+                  labelFormatter={(name) => `${name}`}
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#38b2ac" 
+                  strokeWidth={2} 
+                  activeDot={{ r: 6 }} 
+                />
+              </RechartsLineChart>
             )}
           </ResponsiveContainer>
         ) : (

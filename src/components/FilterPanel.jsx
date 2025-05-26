@@ -62,16 +62,16 @@ const FilterPanel = ({
   return (
     <div className="fixed inset-0 z-50 flex bg-black/50" onClick={onClose}>
       <div 
-        className="bg-dark-400 dark:bg-black w-full max-w-sm ml-auto h-full overflow-y-auto shadow-xl"
+        className="bg-white dark:bg-gray-900 dark:text-white w-full max-w-sm ml-auto h-full overflow-y-auto shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4 border-b border-dark-300">
+        <div className="flex items-center justify-between p-4 border-b border-dark-300 bg-white dark:bg-gray-900">
           <div className="flex items-center">
-            <Filter className="mr-2" size={18} />
-            <h2 className="text-xl font-semibold">Filter</h2>
+            <Filter className="mr-2 text-black dark:text-white" size={18} />	
+            <h2 className="text-xl font-semibold text-black dark:text-white">Filter</h2>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X size={18} />
+          <Button className="color-black dark:color-white" variant="ghost" size="icon" onClick={onClose}>
+            <X size={18} className="text-black dark:text-white" />
           </Button>
         </div>
         
@@ -85,7 +85,7 @@ const FilterPanel = ({
             </Button>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-3 bg">
             {fields.map((field) => (
               <FilterField
                 key={field}
@@ -130,67 +130,15 @@ const FilterField = ({ field, value, onChange, data }) => {
     field.toLowerCase().includes('date') || 
     field.toLowerCase().includes('datum');
   
-  // For date range picker
-  const dateValue = value || [null, null];
-  
-  if (isDateField) {
-    return (
-      <div className="rounded-md bg-white text-dark-500">
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full justify-between font-normal bg-white hover:bg-gray-100 border-0"
-            >
-              <span className="text-gray-800">{field}</span>
-              <ChevronDown size={16} className={cn("ml-2 transition", isOpen ? "transform rotate-180" : "")} />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="range"
-              selected={{
-                from: dateValue[0] || undefined,
-                to: dateValue[1] || undefined,
-              }}
-              onSelect={(range) => {
-                onChange(range ? [range.from || null, range.to || null] : [null, null]);
-              }}
-              initialFocus
-              className={cn("p-3 pointer-events-auto")}
-            />
-            <div className="flex justify-end gap-2 p-2 border-t">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => {
-                  onChange([null, null]);
-                  setIsOpen(false);
-                }}
-              >
-                Clear
-              </Button>
-              <Button 
-                size="sm"
-                onClick={() => setIsOpen(false)}
-              >
-                Apply
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-    );
-  }
   
   // For numeric or text fields
   return (
-    <div className="rounded-md bg-white text-dark-500">
+    <div className="rounded-md bg-white dark:bg-gray-900 text-dark-500">
       <Select 
         value={value?.toString() || "_all"}
         onValueChange={(newValue) => onChange(newValue === "_all" ? null : newValue)}
       >
-        <SelectTrigger className="w-full bg-white border-0">
+        <SelectTrigger className="w-full bg-white dark:bg-gray-900 dark:text-white border-0">
           <SelectValue placeholder={field} />
         </SelectTrigger>
         <SelectContent className="max-h-72">

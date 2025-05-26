@@ -1,17 +1,34 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom'; // Import useLocation
-import DataVisualizer from '../components/DataVisualizer'; // Import the DataVisualizer component
+import { useLocation } from 'react-router-dom';
+import DataVisualizer from '../components/DataVisualizer';
 
-/**
- * Dashboard Page
- * 
- * Displays visualizations using the DataVisualizer component.
- */
 const Dashboard = () => {
-    const location = useLocation(); // Access the location object
-    const chartData = location.state?.chartData; // Retrieve chartData from state
+    const location = useLocation();
+    const chartData = location.state?.chartData || [];
 
-    if (!chartData || chartData.length === 0) {
+    // Process data for line chart by fakturabeskrivning
+    const processLineChartData = () => {
+        const groupedData = {};
+        
+        chartData.forEach(item => {
+            const description = item.fakturabeskrivning || 'Other';
+            if (!groupedData[description]) {
+                groupedData[description] = {
+                    name: description,
+                    value: 0,
+                    count: 0
+                };
+            }
+            groupedData[description].value += item.totalbelopp || 0;
+            groupedData[description].count += 1;
+        });
+
+        return Object.values(groupedData);
+    };
+
+    const lineChartData = processLineChartData();
+
+    if (chartData.length === 0) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-appGray-light dark:bg-gray-900 dark:text-white">
                 <p className="text-xl font-bold">No data available. Please upload a CSV file.</p>
@@ -27,12 +44,27 @@ const Dashboard = () => {
 
             <main className="container mx-auto px-4 sm:px-6 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <DataVisualizer chartData={chartData} chartType="bar" />
-                    <DataVisualizer chartData={chartData} chartType="pie" />
+                    <DataVisualizer 
+                        chartData={chartData} 
+                        chartType="bar" 
+                        dataKey="totalbelopp"
+                        nameKey="mottagare"
+                    />
+                    <DataVisualizer 
+                        chartData={chartData} 
+                        chartType="pie" 
+                        dataKey="fakturabelopp"
+                        nameKey="mottagare"
+                    />
                 </div>
-                <div className="mt-6">
-                    <DataVisualizer chartData={chartData} chartType="line" />
-                </div>
+<div className="mt-6">
+    <DataVisualizer 
+        chartData={lineChartData} 
+        chartType="lineByDescription" 
+        dataKey="value"
+        nameKey="name"
+    />
+</div>
             </main>
         </div>
     );
