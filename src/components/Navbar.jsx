@@ -85,7 +85,7 @@ const Navbar = ({ navigateToDashboard, setIsModalOpen }) => {
         ${
           isDropdownOpen
             ? "bg-[#00CEC0]"
-            : "bg-transparent group-hover:bg-white"
+            : "bg-transparent dark:group-hover:bg-white group-hover:bg-[#00CEC0]"
         }
       `}
             />
