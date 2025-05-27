@@ -7,7 +7,7 @@ const ProfileDropdown = ({
   loggedInUser,
   loggedInUserCompany,
   handleLogout,
-  handleSavedAnalys 
+  handleSavedAnalys,
 }) => {
   const navigate = useNavigate();
 
@@ -31,15 +31,17 @@ const ProfileDropdown = ({
     >
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         <div>
-          <div className="font-semibold">{localStorage.getItem("loggedInUserName") || "Användare"}</div>
-          
-          <div className="text-sm text-gray-400">{loggedInUserCompany || "No Company"}</div>
+          <div className="font-semibold">
+            {localStorage.getItem("loggedInUserName") || "Användare"}
+          </div>
+
+          <div className="text-sm text-gray-400">
+            {loggedInUserCompany || "No Company"}
+          </div>
         </div>
         <Avatar className="h-12 w-12">
           <AvatarImage src="https://github.com/shadcn.png" alt="User Avatar" />
-          <AvatarFallback>
-            {getInitials(loggedInUserCompany)}
-          </AvatarFallback>
+          <AvatarFallback>{getInitials(loggedInUserCompany)}</AvatarFallback>
         </Avatar>
       </div>
       <div className="p-4 space-y-2">
@@ -51,7 +53,7 @@ const ProfileDropdown = ({
         </button>
         <button
           className="w-full text-center hover:bg-[#87D4CE33] rounded-sm py-2 px-[42px] active:bg-[#87D4CE57]"
-          onClick={handleSavedAnalys} 
+          onClick={handleSavedAnalys}
         >
           Sparade analyser
         </button>

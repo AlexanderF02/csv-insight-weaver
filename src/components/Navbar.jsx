@@ -62,13 +62,13 @@ const Navbar = ({ navigateToDashboard, setIsModalOpen }) => {
       <div className="flex items-center space-x-4">
         <ModeToggle />
 
-        <div className="relative">
+        <div className="relative dark:bg-gray-800 rounded-sm">
           <button
             onClick={handleProfileClick}
             title={loggedInUser || "Profil"}
             className={`
                 group flex items-center gap-2 py-2 px-4 relative transition duration-200
-                ${isDropdownOpen ? "text-[#00CEC0]" : "text-white"}
+                ${isDropdownOpen ? "text-[#00CEC0]" : "text-white"}x
              `}
           >
             <span className="text-base font-medium">Profil</span>
@@ -85,7 +85,7 @@ const Navbar = ({ navigateToDashboard, setIsModalOpen }) => {
         ${
           isDropdownOpen
             ? "bg-[#00CEC0]"
-            : "bg-transparent group-hover:bg-[#00CEC0]"
+            : "bg-transparent group-hover:bg-white"
         }
       `}
             />
