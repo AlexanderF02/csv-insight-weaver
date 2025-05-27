@@ -21,8 +21,8 @@ const Register = () => {
         setShowSuccess(true);
 
         
-        setTimeout(() => {
-            setShowSuccess(false);
+        setTimeout(() => { 
+            setShowSuccess(false); 
             navigate('/login');
         }, 1000); 
     };
